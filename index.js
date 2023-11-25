@@ -26,10 +26,6 @@ const middle1 = (req, res, next) => {
         body = fs.readFileSync(path.join(__dirname, './index.html'), encoding = 'utf-8')
         res.status(200).send(body)
         return
-    } else
-    if (fs.existsSync(dirPath) && !fs.lstatSync(dirPath).isDirectory()) {
-        body = fs.readFileSync(dirPath)
-        return res.status(200).send(body)
     }
     next()
 }
