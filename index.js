@@ -2,6 +2,7 @@ var express = require('express')
 const path = require('path')
 const fs = require('fs')
 let app = express()
+const {logSave, logGet, logClear} = require('./logger')
 var Proxy = require('./Proxy')
 let { blockedSites, urlModify, httpprefix, serverName, port, locationReplaceMap302, regReplaceMap, siteSpecificReplace, pathReplace } = require('./config')
 
@@ -9,6 +10,15 @@ let cookieDomainRewrite = serverName
 let proxy = Proxy({ blockedSites, urlModify, httpprefix, serverName, port, cookieDomainRewrite, locationReplaceMap302, regReplaceMap, siteSpecificReplace, pathReplace})
 
 const middle1 = (req, res, next) => {
+
+    if (req.query.url) {
+        const queryUrl = decodeURIComponent(req.query.url);
+        logSave(`redirect query url: ${queryUrl}`)
+        const redirectLocation = locationReplaceMap302({location: queryUrl, serverName, httpprefix, host: '', httpType: ''})
+        logSave(`redirect location: ${redirectLocation}`)
+        return res.redirect(redirectLocation);
+    }
+
     let timestr = new Date().toISOString()
     let myRe = new RegExp(`/http[s]?/${serverName}[0-9:]*?`, 'g') // match group
     req.url = req.url.replace(myRe, '')
